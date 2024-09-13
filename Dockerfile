@@ -1,29 +1,20 @@
-FROM pytorch/pytorch:2.4.0-cuda12.4-cudnn9-devel
+FROM pytorch/pytorch:2.2.1-cuda12.1-cudnn8-devel
+USER root
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV DEBIAN_FRONTEND=noninteractive
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ENV http_proxy=$HTTP_PROXY
+ENV https_proxy=$HTTPS_PROXY
 
-# プロキシ設定を追加
-ARG http_proxy
-ARG https_proxy
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
 
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-dev \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /root/src
 
-WORKDIR /workspace
+WORKDIR /root/src
 
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
 
-COPY . .
+RUN apt-get update && apt-get install -y zip unzip git curl tmux valgrind
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && apt-get install git-lfs && git lfs install
 
-ENV PYTHONUNBUFFERED=1
 
-# Add support for reading .env file
-RUN pip3 install python-dotenv
-
-CMD ["python3", "app.py"]
+ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:${LD_LIBRARY_PATH}

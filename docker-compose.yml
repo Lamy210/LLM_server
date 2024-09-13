@@ -1,0 +1,33 @@
+
+
+services:
+  nishida:
+    ports: 
+      - "8081:8081"
+    build:
+      dockerfile: Dockerfile
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+    container_name: llm-server
+    environment:
+      - http_proxy=$HTTP_PROXY
+      - https_proxy=$HTTPS_PROXY
+      - TZ=Asia/Tokyo
+    env_file:
+      - .env
+    volumes:
+      - ../:/root/src
+    working_dir: /root/src
+    runtime: nvidia
+    tty: true
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 30g
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

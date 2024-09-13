@@ -1,15 +1,16 @@
 {
-  "name": "llm_server",
+  "name": "gpu_dev_environment",
   "build": {
     "dockerfile": "../Dockerfile",
+    "context": "..",
     "args": {
-      "http_proxy": "http://wwwproxy.osakac.ac.jp:8080",
-      "https_proxy": "http://wwwproxy.osakac.ac.jp:8080"
-    },
-    "context": ".."
+      "http_proxy": "${localEnv:HTTP_PROXY}",
+      "https_proxy": "${localEnv:HTTPS_PROXY}"
+    }
   },
   "runArgs": [
-    "--gpus", "all"
+    "--gpus", "all",
+    "--env-file", ".env"
   ],
   "customizations": {
     "vscode": {
@@ -20,10 +21,10 @@
     }
   },
   "remoteEnv": {
-    "HTTP_PROXY": "http://wwwproxy.osakac.ac.jp:8080",
-    "HTTPS_PROXY": "http://wwwproxy.osakac.ac.jp:8080",
-    "http_proxy": "http://wwwproxy.osakac.ac.jp:8080",
-    "https_proxy": "http://wwwproxy.osakac.ac.jp:8080"
+    "HTTP_PROXY": "${localEnv:HTTP_PROXY}",
+    "HTTPS_PROXY": "${localEnv:HTTPS_PROXY}",
+    "http_proxy": "${localEnv:HTTP_PROXY}",
+    "https_proxy": "${localEnv:HTTPS_PROXY}"
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "workspaceFolder": "/workspace",
@@ -31,4 +32,5 @@
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
   ],
   "postCreateCommand": "pip install -r requirements.txt"
+  
 }
